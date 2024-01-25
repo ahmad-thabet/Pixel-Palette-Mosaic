@@ -12,7 +12,7 @@ def write_colors_to_file(colors, filename, mode = 'w'):
             file.write(color + '\n')
 
 # Example: Generate and write num_colors random colors to a file
-num_colors = 1000
+num_colors = 100
 random_colors = generate_random_colors(num_colors)
 
 #output_filename = f'''colors{random.randint(0, 1000)}.txt'''
