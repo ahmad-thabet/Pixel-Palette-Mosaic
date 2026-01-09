@@ -1,0 +1,7 @@
+{
+  "followers": 10,
+  "pixels": [
+    { "x": 123, "y": 456, "color": "#a3f2c1" },
+    { "x": 77, "y": 999, "color": "#ff22aa" }
+  ]
+}

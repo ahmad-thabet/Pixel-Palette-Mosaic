@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Follower Pixels</title>
+  <style>
+    body {
+      background: #111;
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    canvas {
+      border: 1px solid #444;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="1000" height="1000"></canvas>
+
+<script>
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+// Load saved pixels
+fetch("pixels.json")
+  .then(res => res.json())
+  .then(data => {
+    const filled = new Set();
+    const pixels = data.pixels || [];
+    const target = data.followers || 0;
+
+    // Draw existing pixels
+    pixels.forEach(p => {
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, 1, 1);
+      filled.add(`${p.x},${p.y}`);
+    });
+
+    // Add new pixels if needed
+    const needed = target - pixels.length;
+    for (let i = 0; i < needed; i++) {
+      let x, y, key;
+      do {
+        x = Math.floor(Math.random() * 1000);
+        y = Math.floor(Math.random() * 1000);
+        key = `${x},${y}`;
+      } while (filled.has(key));
+
+      const color = randomColor();
+      ctx.fillStyle = color;
+      ctx.fillRect(x, y, 1, 1);
+
+      filled.add(key);
+      pixels.push({ x, y, color });
+    }
+
+    // Log updated JSON (copy-paste this into pixels.json)
+    console.log(JSON.stringify({
+      followers: target,
+      pixels: pixels
+    }, null, 2));
+  });
+
+function randomColor() {
+  return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+}
+</script>
+
+</body>
+</html>
