@@ -1,72 +1,186 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Follower Pixels</title>
-  <style>
-    body {
-      background: #111;
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-    }
-    canvas {
-      border: 1px solid #444;
-      image-rendering: pixelated;
-    }
-  </style>
+<meta charset="UTF-8" />
+<title>1M Follower Pixels</title>
+<style>
+  html, body {
+    margin: 0;
+    background: #0f0f0f;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    image-rendering: pixelated;
+    cursor: grab;
+  }
+  #info {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    color: #ccc;
+    font-family: monospace;
+    font-size: 14px;
+  }
+</style>
 </head>
 <body>
 
-<canvas id="canvas" width="1000" height="1000"></canvas>
+<canvas id="canvas"></canvas>
+<div id="info"></div>
 
 <script>
+/* =======================
+   CONFIG
+======================= */
+const SIZE = 1000;
+const ANIMATION_SPEED = 5000; // pixels per second
+
+/* =======================
+   CANVAS SETUP
+======================= */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// Load saved pixels
-fetch("pixels.json")
-  .then(res => res.json())
+let scale = 1;
+let offsetX = 0;
+let offsetY = 0;
+let dragging = false;
+let lastX, lastY;
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  draw();
+}
+window.addEventListener("resize", resize);
+
+/* =======================
+   SEEDED RANDOM
+======================= */
+function mulberry32(seed) {
+  return function () {
+    seed |= 0;
+    seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+/* =======================
+   DATA
+======================= */
+let targetPixels = 0;
+let drawnPixels = 0;
+let pixelList = [];
+
+/* =======================
+   LOAD DATA
+======================= */
+fetch("data.json")
+  .then(r => r.json())
   .then(data => {
-    const filled = new Set();
-    const pixels = data.pixels || [];
-    const target = data.followers || 0;
+    const today = new Date().toISOString().split("T")[0];
+    const dates = Object.keys(data.followersByDay).sort();
+    let followers = 0;
 
-    // Draw existing pixels
-    pixels.forEach(p => {
-      ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, 1, 1);
-      filled.add(`${p.x},${p.y}`);
-    });
-
-    // Add new pixels if needed
-    const needed = target - pixels.length;
-    for (let i = 0; i < needed; i++) {
-      let x, y, key;
-      do {
-        x = Math.floor(Math.random() * 1000);
-        y = Math.floor(Math.random() * 1000);
-        key = `${x},${y}`;
-      } while (filled.has(key));
-
-      const color = randomColor();
-      ctx.fillStyle = color;
-      ctx.fillRect(x, y, 1, 1);
-
-      filled.add(key);
-      pixels.push({ x, y, color });
+    for (const d of dates) {
+      if (d <= today) followers = data.followersByDay[d];
     }
 
-    // Log updated JSON (copy-paste this into pixels.json)
-    console.log(JSON.stringify({
-      followers: target,
-      pixels: pixels
-    }, null, 2));
+    targetPixels = Math.min(followers, SIZE * SIZE);
+    generatePixels(targetPixels);
+    resize();
+    animate();
   });
 
-function randomColor() {
-  return "#" + Math.floor(Math.random() * 16777215).toString(16).padStart(6, "0");
+/* =======================
+   PIXEL GENERATION
+======================= */
+function generatePixels(count) {
+  const rng = mulberry32(123456);
+  const used = new Set();
+
+  while (pixelList.length < count) {
+    const x = Math.floor(rng() * SIZE);
+    const y = Math.floor(rng() * SIZE);
+    const key = x + "," + y;
+    if (used.has(key)) continue;
+
+    used.add(key);
+    pixelList.push({
+      x,
+      y,
+      color: `hsl(${Math.floor(rng() * 360)},100%,60%)`
+    });
+  }
 }
+
+/* =======================
+   DRAW
+======================= */
+function draw() {
+  ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
+  ctx.clearRect(-offsetX / scale, -offsetY / scale, canvas.width / scale, canvas.height / scale);
+
+  for (let i = 0; i < drawnPixels; i++) {
+    const p = pixelList[i];
+    ctx.fillStyle = p.color;
+    ctx.fillRect(p.x, p.y, 1, 1);
+  }
+
+  document.getElementById("info").textContent =
+    `Pixels: ${drawnPixels} / ${targetPixels}`;
+}
+
+/* =======================
+   ANIMATION
+======================= */
+let lastTime = performance.now();
+
+function animate(time = performance.now()) {
+  const delta = (time - lastTime) / 1000;
+  lastTime = time;
+
+  drawnPixels = Math.min(
+    targetPixels,
+    drawnPixels + delta * ANIMATION_SPEED
+  );
+
+  draw();
+  requestAnimationFrame(animate);
+}
+
+/* =======================
+   INTERACTION
+======================= */
+canvas.addEventListener("mousedown", e => {
+  dragging = true;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  canvas.style.cursor = "grabbing";
+});
+
+window.addEventListener("mouseup", () => {
+  dragging = false;
+  canvas.style.cursor = "grab";
+});
+
+window.addEventListener("mousemove", e => {
+  if (!dragging) return;
+  offsetX += e.clientX - lastX;
+  offsetY += e.clientY - lastY;
+  lastX = e.clientX;
+  lastY = e.clientY;
+  draw();
+});
+
+canvas.addEventListener("wheel", e => {
+  const zoom = e.deltaY < 0 ? 1.1 : 0.9;
+  scale *= zoom;
+  draw();
+});
 </script>
 
 </body>
