@@ -1,14 +1,56 @@
 {
-  "startDate": "2026-01-01",
-  "followersByDay": {
-    "2026-01-01": 0,
-    "2026-01-02": 10,
-    "2026-01-03": 1000,
-    "2026-01-04": 244834,
-    "2026-01-05": 142766,
-    "2026-01-06": 391869,
-    "2026-01-07": 692772,
-    "2026-01-08": 804344,
-    "2026-01-09": 1000000
-  }
+  "lastUpdated": "2026-01-09",
+  "maxPixels": 1000000,
+  "users": [
+    {
+      "username": "chris_johnson",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=chris_johnson",
+      "profileUrl": "https://instagram.com/chris_johnson"
+    },
+    {
+      "username": "sarah_miller",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=sarah_miller",
+      "profileUrl": "https://instagram.com/sarah_miller"
+    },
+    {
+      "username": "mike_chen",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=mike_chen",
+      "profileUrl": "https://instagram.com/mike_chen"
+    },
+    {
+      "username": "emma_wilson",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=emma_wilson",
+      "profileUrl": "https://instagram.com/emma_wilson"
+    },
+    {
+      "username": "alex_brown",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=alex_brown",
+      "profileUrl": "https://instagram.com/alex_brown"
+    },
+    {
+      "username": "jessica_garcia",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=jessica_garcia",
+      "profileUrl": "https://instagram.com/jessica_garcia"
+    },
+    {
+      "username": "david_lee",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=david_lee",
+      "profileUrl": "https://instagram.com/david_lee"
+    },
+    {
+      "username": "sophia_martinez",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=sophia_martinez",
+      "profileUrl": "https://instagram.com/sophia_martinez"
+    },
+    {
+      "username": "james_taylor",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=james_taylor",
+      "profileUrl": "https://instagram.com/james_taylor"
+    },
+    {
+      "username": "olivia_anderson",
+      "profileImageUrl": "https://api.dicebear.com/7.x/avataaars/svg?seed=olivia_anderson",
+      "profileUrl": "https://instagram.com/olivia_anderson"
+    }
+  ]
 }
