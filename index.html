@@ -30,15 +30,9 @@
 <div id="info"></div>
 
 <script>
-/* =======================
-   CONFIG
-======================= */
 const SIZE = 1000;
-const ANIMATION_SPEED = 5000; // pixels per second
+const ANIMATION_SPEED = 50000; // pixels per second
 
-/* =======================
-   CANVAS SETUP
-======================= */
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
@@ -55,9 +49,6 @@ function resize() {
 }
 window.addEventListener("resize", resize);
 
-/* =======================
-   SEEDED RANDOM
-======================= */
 function mulberry32(seed) {
   return function () {
     seed |= 0;
@@ -68,16 +59,11 @@ function mulberry32(seed) {
   };
 }
 
-/* =======================
-   DATA
-======================= */
 let targetPixels = 0;
 let drawnPixels = 0;
 let pixelList = [];
 
-/* =======================
-   LOAD DATA
-======================= */
+
 fetch("data.json")
   .then(r => r.json())
   .then(data => {
@@ -95,9 +81,6 @@ fetch("data.json")
     animate();
   });
 
-/* =======================
-   PIXEL GENERATION
-======================= */
 function generatePixels(count) {
   const rng = mulberry32(123456);
   const used = new Set();
@@ -117,9 +100,6 @@ function generatePixels(count) {
   }
 }
 
-/* =======================
-   DRAW
-======================= */
 function draw() {
   ctx.setTransform(scale, 0, 0, scale, offsetX, offsetY);
   ctx.clearRect(-offsetX / scale, -offsetY / scale, canvas.width / scale, canvas.height / scale);
@@ -131,12 +111,9 @@ function draw() {
   }
 
   document.getElementById("info").textContent =
-    `Pixels: ${drawnPixels} / ${targetPixels}`;
+    `Pixels: ${drawnPixels} / 1 Million`;
 }
 
-/* =======================
-   ANIMATION
-======================= */
 let lastTime = performance.now();
 
 function animate(time = performance.now()) {
@@ -152,9 +129,6 @@ function animate(time = performance.now()) {
   requestAnimationFrame(animate);
 }
 
-/* =======================
-   INTERACTION
-======================= */
 canvas.addEventListener("mousedown", e => {
   dragging = true;
   lastX = e.clientX;
